@@ -808,6 +808,13 @@ message HeaderMatcher {
   // * The regex *\d{3}* does not match the value *1234*
   // * The regex *\d{3}* does not match the value *123.456*
   google.protobuf.BoolValue regex = 3;
+
+  // Specifies whether the header value is a range or not. 
+  // Defaults to false.
+  // When set to true: header value will contain a comma separated string of the form: low,high
+  // The rule will match if the request header value is within this range.
+  // This only applies to integer header values
+  google.protobuf.BoolValue range = 4;
 }
 
 // Query parameter matching treats the query string of a request's :path header
