@@ -768,6 +768,17 @@ message RateLimit {
   repeated Action actions = 3 [(validate.rules).repeated .min_items = 1];
 }
 
+// [#not-implemented-hide:]
+// Specifies the int64 lower and upper bounds of a range.
+// Header route matching will be performed if the header's value lies within this range (inclusive).
+message HeaderValueRange {
+  // Low key, inclusive
+  google.protobuf.Int64Value low_key = 1;
+
+  // High key, inclusive
+  google.protobuf.Int64Value high_key = 2;
+}
+
 // .. attention::
 //
 //   Internally, Envoy always uses the HTTP/2 *:authority* header to represent the HTTP/1 *Host*
@@ -790,7 +801,7 @@ message HeaderMatcher {
 
   // Specifies the value of the header. If the value is absent a request that
   // has the name header will match, regardless of the header’s value.
-  string value = 2;
+  string value = 2 [deprecated = true];
 
   // Specifies whether the header value is a regular
   // expression or not. Defaults to false. The entire request header value must match the regex. The
@@ -803,7 +814,36 @@ message HeaderMatcher {
   // * The regex *\d{3}* matches the value *123*
   // * The regex *\d{3}* does not match the value *1234*
   // * The regex *\d{3}* does not match the value *123.456*
-  google.protobuf.BoolValue regex = 3;
+  google.protobuf.BoolValue regex = 3 [deprecated = true];
+
+  // [#not-implemented-hide:]
+  // Specifies how the header match will be performed to route the request.
+  // If header_match_specifier is absent, a request that has the name header will match, regardless
+  // of the header's value.
+  oneof header_match_specifier {
+    // [#not-implemented-hide:]
+    // If specified, header match will be performed based on the value of the header.
+    string value_match = 4;
+
+    // [#not-implemented-hide:]
+    // If specified, this regex string is a regular expression rule which implies the entire request
+    // header value must match the regex. The rule will not match if only a subsequence of the
+    // request header value matches the regex. The regex grammar used in the value field is defined
+    // `here <http://en.cppreference.com/w/cpp/regex/ecmascript>`_.
+    //
+    // Examples:
+    //
+    // * The regex *\d{3}* matches the value *123*
+    // * The regex *\d{3}* does not match the value *1234*
+    // * The regex *\d{3}* does not match the value *123.456*
+    string regex_match = 5;
+
+    // [#not-implemented-hide:]
+    // If specified, header match will be performed based on range.
+    // The rule will match if the request header value is within this range.
+    // This only applies to integer header values.
+    HeaderValueRange range_match = 6;
+  }
 }
 
 // Query parameter matching treats the query string of a request's :path header

@@ -338,7 +338,8 @@ Headers
   {
     "name": "...",
     "value": "...",
-    "regex": "..."
+    "regex": "...",
+    "range_match": "..."
   }
 
 name
@@ -360,6 +361,9 @@ regex
     * The regex *\d{3}* matches the value *123*
     * The regex *\d{3}* does not match the value *1234*
     * The regex *\d{3}* does not match the value *123.456*
+
+:ref:`range_match <config_http_conn_man_route_table_range>`
+  *(optional, object)* Specifies the range that will be used for header matching.
 
 .. attention::
 
@@ -526,3 +530,25 @@ expose_headers
 max_age
   *(optional, string)* The content for the *access-control-max-age* header.
   Value in seconds for how long the response to the preflight request can be cached.
+
+  .. _config_http_conn_man_route_table_range:
+
+range_match
+--------------
+
+Specifies the int64 lower and upper bounds of a range.
+Header route matching will be performed if the header's value lies within this
+range (inclusive).
+
+.. code-block:: json
+
+  {
+    "low_key": "...",
+    "high_key": "..."
+  }
+
+low_key
+  *(required, integer)* Lower bound of the range.
+
+high_key
+  *(required, integer)* Upper bound of the range.
