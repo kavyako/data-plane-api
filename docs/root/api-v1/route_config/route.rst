@@ -536,19 +536,18 @@ max_age
 range_match
 --------------
 
-Specifies the int64 lower and upper bounds of a range.
-Header route matching will be performed if the header's value lies within this
-range (inclusive).
+Specifies the int64 start and end of the range using half-open interval semantics [start, end).
+Header route matching will be performed if the header's value lies within this range.
 
 .. code-block:: json
 
   {
-    "low_key": "...",
-    "high_key": "..."
+    "start": "...",
+    "end": "..."
   }
 
-low_key
-  *(required, integer)* Lower bound of the range.
+start
+  *(required, integer)* start of the range (inclusive).
 
-high_key
-  *(required, integer)* Upper bound of the range.
+end
+  *(required, integer)* end of the range (exclusive).

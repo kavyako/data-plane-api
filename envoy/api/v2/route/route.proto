@@ -769,14 +769,14 @@ message RateLimit {
 }
 
 // [#not-implemented-hide:]
-// Specifies the int64 lower and upper bounds of a range.
-// Header route matching will be performed if the header's value lies within this range (inclusive).
-message HeaderValueRange {
-  // Low key, inclusive
-  google.protobuf.Int64Value low_key = 1;
+// Specifies the int64 start and end of the range using half-open interval semantics [start, end).
+// Header route matching will be performed if the header's value lies within this range.
+message Int64Range {
+  // start of the range (inclusive)
+  int64 start = 1;
 
-  // High key, inclusive
-  google.protobuf.Int64Value high_key = 2;
+  // end of the range (exclusive)
+  int64 end = 2;
 }
 
 // .. attention::
@@ -801,7 +801,7 @@ message HeaderMatcher {
 
   // Specifies the value of the header. If the value is absent a request that
   // has the name header will match, regardless of the header’s value.
-  string value = 2 [deprecated = true];
+  string value = 2;
 
   // Specifies whether the header value is a regular
   // expression or not. Defaults to false. The entire request header value must match the regex. The
@@ -814,18 +814,17 @@ message HeaderMatcher {
   // * The regex *\d{3}* matches the value *123*
   // * The regex *\d{3}* does not match the value *1234*
   // * The regex *\d{3}* does not match the value *123.456*
-  google.protobuf.BoolValue regex = 3 [deprecated = true];
+  google.protobuf.BoolValue regex = 3;
 
   // [#not-implemented-hide:]
   // Specifies how the header match will be performed to route the request.
-  // If header_match_specifier is absent, a request that has the name header will match, regardless
-  // of the header's value.
+  // If header_match_specifier is absent, a request that has the
+  // :ref:`envoy_api_msg_route.HeaderMatcher.name` header will match, regardless of the header's
+  // value.
   oneof header_match_specifier {
-    // [#not-implemented-hide:]
     // If specified, header match will be performed based on the value of the header.
-    string value_match = 4;
+    string exact_match = 4;
 
-    // [#not-implemented-hide:]
     // If specified, this regex string is a regular expression rule which implies the entire request
     // header value must match the regex. The rule will not match if only a subsequence of the
     // request header value matches the regex. The regex grammar used in the value field is defined
@@ -842,7 +841,11 @@ message HeaderMatcher {
     // If specified, header match will be performed based on range.
     // The rule will match if the request header value is within this range.
     // This only applies to integer header values.
-    HeaderValueRange range_match = 6;
+    //
+    // Examples:
+    //
+    // * For range [-10,0), route will match for header value -1, but not for 0, "somestring".
+    Int64Range range_match = 6;
   }
 }
 
